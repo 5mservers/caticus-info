@@ -4,14 +4,14 @@ local discordToken = 'YOUR_DISCORD_BOT_TOKEN'
 local apiEndpoint = 'https://discord.com/api/v10/users/%s'
 local discordCache = {}
 
--- Framework initialization
+
 if Config.Framework == 'qb' then
     QBCore = exports['qb-core']:GetCoreObject()
 elseif Config.Framework == 'esx' then
     TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 end
 
--- Function to update Discord cache
+
 function UpdateDiscordCache(discordId)
     PerformHttpRequest(
         string.format("https://discordapp.com/api/users/%s", discordId),
@@ -33,7 +33,7 @@ function UpdateDiscordCache(discordId)
     )
 end
 
--- Get Discord info (single implementation)
+
 function GetDiscordInfo(source)
     local identifiers = GetPlayerIdentifiers(source)
     for _, identifier in pairs(identifiers) do
@@ -49,7 +49,7 @@ function GetDiscordInfo(source)
     return nil
 end
 
--- Get player data based on framework
+
 RegisterNetEvent('caticus-info:server:requestPlayerData', function(serverId)
     local src = source
     local data = {}

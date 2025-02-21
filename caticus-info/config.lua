@@ -5,7 +5,7 @@ Config.Command = 'info' -- Command to toggle info boxes
 Config.ShowSelf = true -- Show info above your own head
 Config.DrawDistance = 15.0 -- How far to draw player info
 
--- Box Style Configuration
+
 Config.Box = {
     width = '200px',
     height = '100px',
@@ -15,7 +15,7 @@ Config.Box = {
     offsetY = -100 -- Offset above head in pixels
 }
 
--- Text Style Configuration
+
 Config.Text = {
     nameColor = '#ffffff',
     healthColor = '#32CD32',

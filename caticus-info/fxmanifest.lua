@@ -1,9 +1,9 @@
 fx_version 'cerulean'
 game 'gta5'
 
-author 'Caticus'
-description 'A simple way to view player information via command'
-website 'www.5Mservers.com'
+author 'Your Name'
+description 'Player Info Display System'
+version '1.0.0'
 
 shared_scripts {
     'config.lua'
