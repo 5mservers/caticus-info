@@ -2,19 +2,26 @@ local QBCore = nil
 local ESX = nil
 local showInfo = false
 local playerData = {}
+local mugshotCache = {}
 
-
-RegisterCommand(Config.Command, function()
-    showInfo = not showInfo
-    if not showInfo then
-
-        SendNUIMessage({
-            action = 'hideAll'
-        })
-    end
+-- Show command
+RegisterCommand(Config.ShowCommand, function()
+    showInfo = true
 end)
 
+-- Hide command
+RegisterCommand(Config.HideCommand, function()
+    showInfo = false
+    -- Simple, direct cleanup
+    SendNUIMessage({
+        action = 'clearAll'
+    })
+    -- Clear local data
+    playerData = {}
+    mugshotCache = {}
+end)
 
+-- Add this helper function
 function GetPlayerMugshot(ped)
     local mugshot = RegisterPedheadshot(ped)
     while not IsPedheadshotReady(mugshot) do
@@ -25,7 +32,7 @@ function GetPlayerMugshot(ped)
     return "https://nui-img/" .. txd .. "/" .. txd
 end
 
-
+-- Add this function to match your ID script's positioning
 function Draw3DText(x, y, z, text)
     local onScreen, _x, _y = World3dToScreen2d(x, y, z)
     if onScreen then
@@ -36,6 +43,7 @@ function Draw3DText(x, y, z, text)
     return nil, nil, nil
 end
 
+-- Add this function from your ID script
 function GetNeareastPlayers()
     local playerPed = PlayerPedId()
     local players = {}
@@ -43,7 +51,7 @@ function GetNeareastPlayers()
     if Config.Framework == 'qb' then
         players, _ = QBCore.Functions.GetPlayers(GetEntityCoords(playerPed), Config.DrawDistance)
     elseif Config.Framework == 'esx' then
-
+        -- ESX way of getting nearby players
         local coords = GetEntityCoords(playerPed)
         for _, player in ipairs(GetActivePlayers()) do
             local targetPed = GetPlayerPed(player)
@@ -67,14 +75,18 @@ function GetNeareastPlayers()
     return players_clean
 end
 
-
+-- Main thread
 CreateThread(function()
     if Config.Framework == 'qb' then
         QBCore = exports['qb-core']:GetCoreObject()
     elseif Config.Framework == 'esx' then
-        while ESX == nil do
-            TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
-            Wait(0)
+        if GetResourceState('es_extended') ~= 'missing' then
+            ESX = exports['es_extended']:getSharedObject() -- ESX Legacy support
+        else
+            while ESX == nil do -- Old ESX support
+                TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
+                Wait(0)
+            end
         end
     end
 
@@ -84,17 +96,18 @@ CreateThread(function()
             local nearbyPlayers = GetNeareastPlayers()
             for _, player in pairs(nearbyPlayers) do
                 local x, y, z = table.unpack(player.coords)
-
-                local headCoords = GetPedBoneCoords(player.ped, 31086, 0.0, 0.0, 0.0) 
-                local onScreen, _x, _y = World3dToScreen2d(headCoords.x, headCoords.y, headCoords.z + 0.5) 
+                -- Get bone coords for more precise head tracking
+                local headCoords = GetPedBoneCoords(player.ped, 31086, 0.0, 0.0, 0.0) -- 31086 is the head bone
+                local onScreen, _x, _y = World3dToScreen2d(headCoords.x, headCoords.y, headCoords.z + 0.5) -- Reduced offset for closer positioning
                 
                 if onScreen then
                     local dist = #(GetGameplayCamCoords() - headCoords)
-
+                    -- Only show if within reasonable distance
                     if dist < 20.0 then
                         local serverId = player.playerId
                         local health = GetEntityHealth(player.ped)
 
+                        -- Request player data if we don't have it
                         if not playerData[serverId] then
                             TriggerServerEvent('caticus-info:server:requestPlayerData', serverId)
                         end
@@ -126,25 +139,7 @@ RegisterNetEvent('caticus-info:client:receivePlayerData', function(serverId, dat
     playerData[serverId] = data
 end)
 
-
+-- Update resource stop handler
 AddEventHandler('onResourceStop', function(resourceName)
     if (GetCurrentResourceName() ~= resourceName) then return end
-    
-
-    for _, data in pairs(mugshotCache) do
-        if data.id then
-            UnregisterPedheadshot(data.id)
-        end
-    end
-end)
-
-
-RegisterNetEvent('caticus-info:client:hideInfo', function()
-
-    for _, data in pairs(mugshotCache) do
-        if data.id then
-            UnregisterPedheadshot(data.id)
-        end
-    end
-    mugshotCache = {}
 end) 

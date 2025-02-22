@@ -1,11 +1,16 @@
 Config = {}
 
-Config.Framework = 'qb' -- 'qb' or 'esx'
-Config.Command = 'info' -- Command to toggle info boxes
+Config.Framework = 'qb' -- 'qb' or 'esx' or 'esx_legacy'
+Config.ShowCommand = 'showinfo' -- Command to show info
+Config.HideCommand = 'hideinfo' -- Command to hide info
 Config.ShowSelf = true -- Show info above your own head
 Config.DrawDistance = 15.0 -- How far to draw player info
 
+Config.ESX = {
+    Legacy = true -- Set to true for ESX Legacy, false for old ESX
+}
 
+-- Box Style Configuration
 Config.Box = {
     width = '200px',
     height = '100px',
@@ -15,7 +20,7 @@ Config.Box = {
     offsetY = -100 -- Offset above head in pixels
 }
 
-
+-- Text Style Configuration
 Config.Text = {
     nameColor = '#ffffff',
     healthColor = '#32CD32',

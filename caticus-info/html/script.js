@@ -5,17 +5,11 @@ window.addEventListener('message', function(event) {
     
     if (data.action === 'updatePlayer') {
         updatePlayerBox(data.data);
-    } else if (data.action === 'hideAll') {
-        hideAllBoxes();
+    } else if (data.action === 'clearAll') {
+        document.querySelectorAll('.player-box').forEach(box => box.remove());
+        playerBoxes = {};
     }
 });
-
-function hideAllBoxes() {
-    for (let id in playerBoxes) {
-        playerBoxes[id].remove();
-    }
-    playerBoxes = {};
-}
 
 function updatePlayerBox(data) {
     let box = playerBoxes[data.serverId];
@@ -26,11 +20,9 @@ function updatePlayerBox(data) {
         playerBoxes[data.serverId] = box;
     }
     
-    // Update position using the same coordinates as ID script
     box.style.left = `${data.position.x}px`;
     box.style.top = `${data.position.y}px`;
     
-    // Update content
     updateBoxContent(box, data);
 }
 
@@ -57,6 +49,10 @@ function updateBoxContent(box, data) {
                 <div class="info-row">
                     <span class="label">Steam:</span>
                     <span class="value">${data.steamName}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Job:</span>
+                    <span class="value job-text">${playerData.job || 'Unemployed'}</span>
                 </div>
                 <div class="info-row">
                     <span class="label">ID:</span>

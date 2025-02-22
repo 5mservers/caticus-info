@@ -1,54 +1,15 @@
 local QBCore = nil
 local ESX = nil
-local discordToken = 'YOUR_DISCORD_BOT_TOKEN'
-local apiEndpoint = 'https://discord.com/api/v10/users/%s'
-local discordCache = {}
-
 
 if Config.Framework == 'qb' then
     QBCore = exports['qb-core']:GetCoreObject()
 elseif Config.Framework == 'esx' then
-    TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
-end
-
-
-function UpdateDiscordCache(discordId)
-    PerformHttpRequest(
-        string.format("https://discordapp.com/api/users/%s", discordId),
-        function(errorCode, resultData, resultHeaders)
-            if errorCode == 200 then
-                local userData = json.decode(resultData)
-                if userData and userData.avatar then
-                    discordCache[discordId] = {
-                        name = userData.username,
-                        avatar = userData.avatar,
-                        timestamp = os.time()
-                    }
-                end
-            end
-        end,
-        'GET',
-        '',
-        {['Content-Type'] = 'application/json'}
-    )
-end
-
-
-function GetDiscordInfo(source)
-    local identifiers = GetPlayerIdentifiers(source)
-    for _, identifier in pairs(identifiers) do
-        if string.find(identifier, "discord:") then
-            local discordId = string.gsub(identifier, "discord:", "")
-            return {
-                id = discordId,
-                name = GetPlayerName(source),
-                avatar = string.format('https://cdn.discordapp.com/avatars/%s/%s', discordId, discordId)
-            }
-        end
+    if GetResourceState('es_extended') ~= 'missing' then
+        ESX = exports['es_extended']:getSharedObject()
+    else
+        TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
     end
-    return nil
 end
-
 
 RegisterNetEvent('caticus-info:server:requestPlayerData', function(serverId)
     local src = source
@@ -61,17 +22,22 @@ RegisterNetEvent('caticus-info:server:requestPlayerData', function(serverId)
                 charName = Player.PlayerData.charinfo.firstname .. ' ' .. Player.PlayerData.charinfo.lastname,
                 cash = Player.PlayerData.money.cash,
                 bank = Player.PlayerData.money.bank,
-                discord = GetDiscordInfo(serverId)
+                job = Player.PlayerData.job.label
             }
         end
     elseif Config.Framework == 'esx' then
         local xPlayer = ESX.GetPlayerFromId(serverId)
         if xPlayer then
+            local charName = xPlayer.getName and xPlayer.getName() or xPlayer.name
+            local cash = xPlayer.getMoney and xPlayer.getMoney() or xPlayer.money
+            local bank = xPlayer.getAccount and xPlayer.getAccount('bank').money or xPlayer.bank
+            local job = xPlayer.getJob and xPlayer.getJob().label or xPlayer.job.label
+            
             data = {
-                charName = xPlayer.getName(),
-                cash = xPlayer.getMoney(),
-                bank = xPlayer.getAccount('bank').money,
-                discord = GetDiscordInfo(serverId)
+                charName = charName,
+                cash = cash,
+                bank = bank,
+                job = job
             }
         end
     end
