@@ -6,6 +6,7 @@ We noticed people releasing similar basic menus with less features as paid scrip
 /hideinfo = Command to close the info screen
 
 - View Character Name
+- View Character Job
 - View Steam Name
 - View ID Number
 - View Health
