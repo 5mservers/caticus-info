@@ -6,9 +6,7 @@ Config.HideCommand = 'hideinfo' -- Command to hide info
 Config.ShowSelf = true -- Show info above your own head
 Config.DrawDistance = 15.0 -- How far to draw player info
 
-Config.ESX = {
-    Legacy = true -- Set to true for ESX Legacy, false for old ESX
-}
+
 
 -- Box Style Configuration
 Config.Box = {
