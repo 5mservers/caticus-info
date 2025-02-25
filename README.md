@@ -1,17 +1,8 @@
 # caticus-info
 
-We noticed people releasing similar basic menus with less features as paid scripts, so we decided to quickly create and release a free open source version for you!
+Since the fiveM mods have banned my forum account for the second time this year and I can not longer offer support via the forums
 
-/showinfo = Command to open the info screen
-/hideinfo = Command to close the info screen
-
-- View Character Name
-- View Character Job
-- View Steam Name
-- View ID Number
-- View Health
-- View Bank & Cash
-- View Mugshot
+All downloads are now available https://www.5Mservers.com
 
 # Character Info Menu
 ![Character Information](https://i.imgur.com/c4d9vnC.png)
